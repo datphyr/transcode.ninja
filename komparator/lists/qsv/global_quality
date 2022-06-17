@@ -6,3 +6,16 @@
 -global_quality 21
 -global_quality 22
 -global_quality 23
+-global_quality 24
+-global_quality 25
+-global_quality 22 -look_ahead 1
+-global_quality 23 -look_ahead 1
+-global_quality 24 -look_ahead 1
+-global_quality 25 -look_ahead 1
+-global_quality 26 -look_ahead 1
+-global_quality 27 -look_ahead 1
+-global_quality 28 -look_ahead 1
+-global_quality 29 -look_ahead 1
+-global_quality 30 -look_ahead 1
+-global_quality 31 -look_ahead 1
+-global_quality 32 -look_ahead 1

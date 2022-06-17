@@ -37,10 +37,11 @@ echo
 echo "encoding ..."
 while read encode; do
   suffix=$(echo "$encode" | sed 's/ /_/g')
-  encodefile="$filewin.$suffix.mkv"
+  encodefile="$file.$suffix.mkv"
+  encodefilewin="$filewin.$suffix.mkv"
   if [ ! -f "$encodefile" ] || [ ! -s "$encodefile" ]; then
     echo "       encoding $encodefile ..."
-    ffmpeg -i $filewin -c:v h264_qsv $encode $hcffmpegopts -n $encodefile 2> logs/$filename.$suffix.log
+    ffmpeg -i $filewin -c:v h264_qsv $encode $hcffmpegopts -n $encodefilewin 2> logs/$filename.$suffix.log
   else
     echo "already encoded $encodefile"
   fi
