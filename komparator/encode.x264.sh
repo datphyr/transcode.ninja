@@ -53,8 +53,6 @@ echo "$encodescount encodes:"
 echo "$encodes" | nl -w3 -s'. '
 echo
 
-exit
-
 # encoding loop
 echo "encoding ..."
 for encode in $encodes; do
