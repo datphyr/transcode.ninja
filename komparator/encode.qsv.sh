@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# haxx
+# we have ffmpeg 5 build for windows so lets use it to encode
+function ffmpeg {
+  /mnt/d/Garbage/ffmpeg/ffmpeg-5.0.1-full_build/bin/ffmpeg.exe "$@"
+}
+
 # hardcoded variables
 hcffmpegopts="-pix_fmt nv12"
 
@@ -12,6 +18,7 @@ fi
 # read variables from input or use defaults
 file=$1
 filename=$(basename "$file")
+filewin=$(wslpath -w $file)
 encodelist=${2:-*}
 
 encodes=$(cat lists/qsv/$encodelist | sort -uV)
@@ -30,14 +37,15 @@ echo
 echo "encoding ..."
 while read encode; do
   suffix=$(echo "$encode" | sed 's/ /_/g')
-  encodefile="$file.$suffix.mkv"
+  encodefile="$filewin.$suffix.mkv"
   if [ ! -f "$encodefile" ] || [ ! -s "$encodefile" ]; then
     echo "       encoding $encodefile ..."
-    ffmpeg -i $file -c:v h264_qsv $encode $hcffmpegopts -n $encodefile 2> logs/$filename.$suffix.log
+    ffmpeg -i $filewin -c:v h264_qsv $encode $hcffmpegopts -n $encodefile 2> logs/$filename.$suffix.log
   else
     echo "already encoded $encodefile"
   fi
-done <<< "$encodes" | nl -w3 -s'. '
+done <<< "$encodes"
+# | nl -w3 -s'. '
 
 echo
 
@@ -53,4 +61,5 @@ while read encode; do
   else
     echo "metrics already computed at $metricsfile"
   fi
-done <<< "$encodes" | nl -w3 -s'. '
+done <<< "$encodes"
+# | nl -w3 -s'. '
