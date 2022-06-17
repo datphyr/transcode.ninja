@@ -1,16 +1,8 @@
 #!/bin/bash
 
 # hardcoded variables
-#hcffmpegopts="-threads 16 -pix_fmt yuv420p -g 120 -maxrate 8M -bufsize 16M"
-#hcffmpegopts="-threads 16 -pix_fmt yuv420p -g 120"
-#hcffmpegopts="-threads 16 -pix_fmt yuv420p -g 120 -b:v 8M -minrate 8M -maxrate 8M -bufsize 16M"
-#hcffmpegopts="-threads 16 -pix_fmt yuv420p -g 120 -minrate 8M"
-#hcffmpegopts="-threads 16 -pix_fmt yuv420p"
-#hcffmpegopts="-threads 16 -pix_fmt nv12"
 hcffmpegopts="-pix_fmt nv12"
-#hcx264opts="bitrate=8000:vbv-maxrate=8000:vbv-bufsize=16000"
 hcx264opts="threads=16:nal-hrd=cbr:bitrate=8000:vbv-maxrate=8000:vbv-bufsize=16000:keyint=120"
-#hcx264opts="nal-hrd=cbr"
 
 # function to deduplicate x264 opts and also sort them
 # - replace ':' with newlines
@@ -37,16 +29,14 @@ fi
 file=$1
 filename=$(basename "$file")
 encodelist=$2
-#encodelist="${2:-encode.list}"
 preset=${3:-veryfast}
 
 # get encodes and sort them
-encodes=$(cat lists/$encodelist)
 if [[ ! $encodelist ]]; then
   encodelist="encode.list"
-  encodes=$(cat $encodelist)
-else
   encodes=$(cat lists/$encodelist)
+else
+  encodes=$(cat lists/x264/$encodelist)
 fi
 
 encodes=$(encodesdedup $encodes | sort -uV)
@@ -63,15 +53,16 @@ echo "$encodescount encodes:"
 echo "$encodes" | nl -w3 -s'. '
 echo
 
+exit
+
 # encoding loop
 echo "encoding ..."
 for encode in $encodes; do
-  #encode=$(x264optsdedup "$encode")
   x264opts=$(x264optsdedup "$hcx264opts:$encode")
   encodefile="$file.$preset.$encode.mkv"
   if [ ! -f "$encodefile" ] || [ ! -s "$encodefile" ]; then
     echo "       encoding $encodefile ..."
-    ffmpeg -i $file -c:v libx264 -x264-params "$x264opts" -preset $preset $ffmpegopts -n $encodefile 2> logs/$filename.$preset.$encode.log
+    ffmpeg -i $file -c:v libx264 -x264-params "$x264opts" -preset $preset $hcffmpegopts -n $encodefile 2> logs/$filename.$preset.$encode.log
   else
     echo "already encoded $encodefile"
   fi
@@ -82,7 +73,6 @@ echo
 # metrics loop
 echo "computing metrics ..."
 for encode in $encodes; do
-  #encode=$(x264optsdedup "$encode")
   encodefile="$file.$preset.$encode.mkv"
   metricsfile="metrics/$filename.$preset.$encode.json"
   if [ ! -f "$metricsfile" ] || [ ! -s "$metricsfile" ]; then
