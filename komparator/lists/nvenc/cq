@@ -1,0 +1,6 @@
+-rc vbr -cq 25 -qmin 25 -qmax 25
+-rc vbr -cq 26 -qmin 26 -qmax 26
+-rc vbr -cq 27 -qmin 27 -qmax 27
+-rc vbr -cq 28 -qmin 28 -qmax 28
+-rc vbr -cq 29 -qmin 29 -qmax 29
+-rc vbr -cq 30 -qmin 30 -qmax 30

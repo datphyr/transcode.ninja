@@ -2,20 +2,20 @@
 
 # hardcoded variables
 hcffmpegopts="-pix_fmt nv12"
-#hcx264opts="threads=16:nal-hrd=cbr:bitrate=8000:vbv-maxrate=8000:vbv-bufsize=16000:keyint=120"
-hcx264opts="threads=16"
+#hcx265opts="threads=16:nal-hrd=cbr:bitrate=8000:vbv-maxrate=8000:vbv-bufsize=16000:keyint=120"
+hcx265opts="threads=16"
 
-# function to deduplicate x264 opts and also sort them
+# function to deduplicate x265 opts and also sort them
 # - replace ':' with newlines
 # - sort and uniq
 # - replace newlines with ':'
 # - fix possible ':' at start/end
-function x264optsdedup { echo "$@" | sed 's/:/\n/g' | sort -uV | tr '\n' ':' | sed 's/:$//g; s/^://g' ;}
+function x265optsdedup { echo "$@" | sed 's/:/\n/g' | sort -uV | tr '\n' ':' | sed 's/:$//g; s/^://g' ;}
 
 # function to deduplicate options in every encode
 function encodesdedup {
   for encode in $@; do
-    x264optsdedup "$encode"
+    x265optsdedup "$encode"
     echo
   done
 }
@@ -37,7 +37,7 @@ if [[ ! $encodelist ]]; then
   encodelist="encode.list"
   encodes=$(cat lists/$encodelist)
 else
-  encodes=$(cat lists/x264/$encodelist)
+  encodes=$(cat lists/x265/$encodelist)
 fi
 
 encodes=$(encodesdedup $encodes | sort -uV)
@@ -46,8 +46,8 @@ encodescount=$(echo "$encodes" | wc -l)
 # print info
 echo "        video file: $file"
 echo "      encodes file: $encodelist"
-echo "base   x264 preset: $preset"
-echo "base   x264 params: $hcx264opts"
+echo "base   x265 preset: $preset"
+echo "base   x265 params: $hcx265opts"
 echo "base ffmpeg params: $hcffmpegopts"
 echo
 echo "$encodescount encodes:"
@@ -57,11 +57,11 @@ echo
 # encoding loop
 echo "encoding ..."
 for encode in $encodes; do
-  x264opts=$(x264optsdedup "$hcx264opts:$encode")
-  encodefile="$file.x264.$preset.$encode.mkv"
+  x265opts=$(x265optsdedup "$hcx265opts:$encode")
+  encodefile="$file.x265.$preset.$encode.mkv"
   if [ ! -f "$encodefile" ] || [ ! -s "$encodefile" ]; then
     echo "       encoding $encodefile ..."
-    ffmpeg -i $file -c:v libx264 -x264-params "$x264opts" -preset $preset $hcffmpegopts -n $encodefile 2> logs/$filename.$preset.$encode.log
+    ffmpeg -i $file -c:v libx265 -x265-params "$x265opts" -preset $preset $hcffmpegopts -n $encodefile 2> logs/$filename.$preset.$encode.log
   else
     echo "already encoded $encodefile"
   fi
@@ -72,8 +72,8 @@ echo
 # metrics loop
 echo "computing metrics ..."
 for encode in $encodes; do
-  encodefile="$file.x264.$preset.$encode.mkv"
-  metricsfile="metrics/$filename.x264.$preset.$encode.json"
+  encodefile="$file.x265.$preset.$encode.mkv"
+  metricsfile="metrics/$filename.x265.$preset.$encode.json"
   if [ ! -f "$metricsfile" ] || [ ! -s "$metricsfile" ]; then
     echo "       computing metrics at $metricsfile ..."
     ffmpeg_quality_metrics --metrics vmaf psnr ssim vif -t 16 "$encodefile" "$file" > $metricsfile

@@ -1,4 +1,4 @@
-#!/bin/bash
+-0.125#!/bin/bash
 
 # haxx
 # we have ffmpeg 5 build for windows so lets use it to encode
@@ -21,7 +21,7 @@ filename=$(basename "$file")
 filewin=$(wslpath -w $file)
 encodelist=${2:-*}
 
-encodes=$(cat lists/qsv/$encodelist | sort -uV)
+encodes=$(cat lists/nvenc/$encodelist | sort -uV)
 encodescount=$(echo "$encodes" | wc -l)
 
 # print info
@@ -36,12 +36,12 @@ echo
 # encoding loop
 echo "encoding ..."
 while read encode; do
-  suffix=$(echo "$encode" | sed 's/ /_/g')
-  encodefile="$file.qsv.$suffix.mkv"
-  encodefilewin="$filewin.qsv.$suffix.mkv"
+  suffix=$(echo "$encode" | sed 's/ /_/g; s/:/-/g')
+  encodefile="$file.nvenc.$suffix.mkv"
+  encodefilewin="$filewin.nvenc.$suffix.mkv"
   if [ ! -f "$encodefile" ] || [ ! -s "$encodefile" ]; then
     echo "       encoding $encodefile ..."
-    ffmpeg -i $filewin -c:v h264_qsv $encode $hcffmpegopts -n $encodefilewin 2> logs/$filename.$suffix.log
+    ffmpeg -i $filewin -c:v h264_nvenc $encode $hcffmpegopts -n $encodefilewin 2> logs/$filename.$suffix.log
   else
     echo "already encoded $encodefile"
   fi
@@ -54,8 +54,8 @@ echo
 echo "computing metrics ..."
 while read encode; do
   suffix=$(echo "$encode" | sed 's/ /_/g')
-  encodefile="$file.qsv.$suffix.mkv"
-  metricsfile="metrics/$filename.qsv.$suffix.json"
+  encodefile="$file.nvenc.$suffix.mkv"
+  metricsfile="metrics/$filename.nvenc.$suffix.json"
   if [ ! -f "$metricsfile" ] || [ ! -s "$metricsfile" ]; then
     echo "       computing metrics at $metricsfile ..."
     ffmpeg_quality_metrics --metrics vmaf psnr ssim vif -t 16 "$encodefile" "$file" > $metricsfile
