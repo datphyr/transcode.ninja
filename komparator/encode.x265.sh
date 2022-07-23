@@ -61,7 +61,7 @@ for encode in $encodes; do
   encodefile="$file.x265.$preset.$encode.mkv"
   if [ ! -f "$encodefile" ] || [ ! -s "$encodefile" ]; then
     echo "       encoding $encodefile ..."
-    ffmpeg -i $file -c:v libx265 -x265-params "$x265opts" -preset $preset $hcffmpegopts -n $encodefile 2> logs/$filename.$preset.$encode.log
+    ffmpeg -i $file -c:v libx265 -x265-params "$x265opts" -preset $preset $hcffmpegopts -n $encodefile 2> logs/$filename.x265.$preset.$encode.log
   else
     echo "already encoded $encodefile"
   fi

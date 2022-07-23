@@ -41,7 +41,7 @@ while read encode; do
   encodefilewin="$filewin.qsv.$suffix.mkv"
   if [ ! -f "$encodefile" ] || [ ! -s "$encodefile" ]; then
     echo "       encoding $encodefile ..."
-    ffmpeg -i $filewin -c:v h264_qsv $encode $hcffmpegopts -n $encodefilewin 2> logs/$filename.$suffix.log
+    ffmpeg -i $filewin -c:v h264_qsv $encode $hcffmpegopts -n $encodefilewin 2> logs/$filename.qsv.$suffix.log
   else
     echo "already encoded $encodefile"
   fi
